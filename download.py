@@ -1,10 +1,14 @@
-from urllib import request
-from urllib import error
-from hashlib import md5
-from glob import glob
-from os import remove
+"""
+Script to download and filter images from a textfile with urls
+"""
 
-DIRECTORY = 'rose/'
+from glob import glob
+from hashlib import md5
+from os import remove
+from urllib import error
+from urllib import request
+
+DIRECTORY = 'data/rose/'
 
 
 def download():

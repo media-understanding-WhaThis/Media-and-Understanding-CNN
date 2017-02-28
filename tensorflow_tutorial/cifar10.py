@@ -40,10 +40,10 @@ import re
 import sys
 import tarfile
 
-from six.moves import urllib
 import tensorflow as tf
+from six.moves import urllib
 
-import cifar10_input
+from tensorflow_tutorial import cifar10_input
 
 FLAGS = tf.app.flags.FLAGS
 
