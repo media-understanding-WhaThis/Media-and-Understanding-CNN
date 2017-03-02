@@ -183,47 +183,50 @@ if __name__ == '__main__':
         'sunflower': 1,
         'daisy': 2
     }
-
+    
+    train_size = 512
+    test_size = 20 
+    
     # ROSES
     rose_all_filenames = glob.glob('data/plantset/rose/*')
     print('There are {} rose files.'.format(len(rose_all_filenames)))
     # rose_train_files = roses_all_filenames[:int(len(roses_all_filenames) * .90)]  # Percentage
     # rose_test_files = roses_all_filenames[-int(len(roses_all_filenames) * .10):]
-    rose_train_files = rose_all_filenames[:1024]  # TODO FIX set real data size
-    rose_test_files = rose_all_filenames[-20:]  # TODO FIX set real data size
+    rose_train_files = rose_all_filenames[:train_size]  # TODO FIX set real data size
+    rose_test_files = rose_all_filenames[-test_size:]  # TODO FIX set real data size
     print('Roses train file...')
     write_data_to_dict('data/plantset/train_rose.p', rose_train_files, [labels['rose']] * len(rose_train_files),
-                       'rose_train', max_images=1024)
+                       'rose_train', max_images=train_size)
     print('Roses test file...')
     write_data_to_dict('data/plantset/test_rose.p', rose_test_files, [labels['rose']] * len(rose_test_files),
-                       'rose_test', max_images=20)
+                       'rose_test', max_images=test_size)
 
     # SUNFLOWERS
     sunflower_all_filenames = glob.glob('data/plantset/sunflower/*')
     print('There are {} sunflower files.'.format(len(sunflower_all_filenames)))
     # sunflower_train_files = sunflowers_all_filenames[:int(len(sunflowers_all_filenames) * .90)]  # Percentage
     # sunflower_test_files = sunflowers_all_filenames[-int(len(sunflowers_all_filenames) * .10):]
-    sunflower_train_files = sunflower_all_filenames[:1024]  # TODO FIX set real data size
-    sunflower_test_files = sunflower_all_filenames[-20:]  # TODO FIX set real data size
+    sunflower_train_files = sunflower_all_filenames[:train_size]  # TODO FIX set real data size
+    sunflower_test_files = sunflower_all_filenames[-test_size:]  # TODO FIX set real data size
     print('Sunflowers train file...')
     write_data_to_dict('data/plantset/train_sunflower.p', sunflower_train_files,
                        [labels['sunflower']] * len(sunflower_train_files),
-                       'sunflower_train', max_images=1024)
+                       'sunflower_train', max_images=train_size)
     print('Sunflowers test file...')
     write_data_to_dict('data/plantset/test_sunflower.p', sunflower_test_files,
                        [labels['sunflower']] * len(sunflower_test_files),
-                       'sunflower_test', 20)
+                       'sunflower_test', test_size)
 
     # COMMON DAISIES
     daisy_all_filenames = glob.glob('data/plantset/daisy/*')
     print('There are {} daisy files.'.format(len(daisy_all_filenames)))
     # daisy_train_files = daisy_all_filenames[:int(len(daisy_all_filenames) * .90)]  # Percentage
     # daisy_test_files = daisy_all_filenames[-int(len(daisy_all_filenames) * .10):]
-    daisy_train_files = daisy_all_filenames[:1024]  # TODO FIX set real data size
-    daisy_test_files = daisy_all_filenames[-20:]  # TODO FIX set real data size
+    daisy_train_files = daisy_all_filenames[:train_size]  # TODO FIX set real data size
+    daisy_test_files = daisy_all_filenames[-test_size:]  # TODO FIX set real data size
     print('Daisy train file...')
     write_data_to_dict('data/plantset/train_daisy.p', daisy_train_files, [labels['daisy']] * len(daisy_train_files),
-                       'daisy_train', max_images=1024)
+                       'daisy_train', max_images=train_size)
     print('Daisy test file...')
     write_data_to_dict('data/plantset/test_daisy.p', daisy_test_files, [labels['daisy']] * len(daisy_test_files),
-                       'daisy_test', max_images=20)
+                       'daisy_test', max_images=test_size)
