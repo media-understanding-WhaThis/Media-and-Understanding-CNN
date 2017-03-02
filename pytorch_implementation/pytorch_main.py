@@ -49,7 +49,7 @@ class Net(nn.Module):
         return x
 
 
-def train(net, train_loader, criterion, optimizer, cuda=False, epochs=10):
+def train(net, train_loader, criterion, optimizer, cuda=False, epochs=30):
     print('Start Training')
     for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -154,7 +154,7 @@ def run_plant():
     test_set = PlantDataset(root='data/plantset', transform=transform)
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
 
-    classes = ['rose', 'sunflower', 'daisy']  # TODO check whether this works
+    classes = ['rose', 'sunflower', 'daisy', 'hyacinth']
 
     # SHOW IMAGE EXAMPLE
     dataiter = iter(train_loader)
