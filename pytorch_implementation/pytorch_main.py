@@ -75,12 +75,37 @@ def train(net, train_loader, criterion, optimizer, cuda=False):
 
             # print statistics
             running_loss += loss.data[0]
-            if i % 2000 == 1999:  # print every 2000 mini-batches
+            
+            #print("i is:"+i)
+            #if i % 2000 == 1999:  # print every 2000 mini-batches
+            if i % 50 == 0:  # print every 2000 mini-batches
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
                 running_loss = 0.0
     print('Finished Training')
 
-
+def test(net, test_loader, classes):
+    print('Start Testing')
+    correct = 0
+    total = 0
+    class_correct = list(0. for i in range((len(classes))))
+    class_total = list(0. for i in range(len(classes)))
+    for data in test_loader:
+        images, labels = data
+        outputs = net(Variable(images))
+        _, predicted = torch.max(outputs.data, 1)
+        total += labels.size(0)
+        correct += (predicted == labels).sum()
+        
+        c = (predicted == labels).squeeze()
+        for i in range(4):
+            label = labels[i]
+            class_correct[label] += c[i]
+            class_total[label] += 1    
+    print('Accuracy of the network on test images: %d %%' % (100 * correct / total))
+            
+    for i in range(len(classes)):
+        print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))
+    
 def run_cifar():
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
@@ -101,17 +126,16 @@ def run_cifar():
 
 def run_plant():
     transform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-                                    ])
-
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),])
+        
     # TODO FIX the data sizes for the real size we are going to use
     train_set = PlantDataset(root='data/plantset', data_size=1024, transform=transform)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
+     
+    test_set = PlantDataset(root='data/plantset', data_size=1024, transform=transform)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
 
-    # test_set = PlantDataset(root='data/plantset', data_size=20, transform=transform)
-    # test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
-
-    classes = ['rose']
+    classes = ['rose'] # TODO add 'sunflower' and 'commonDaisy' after generating the data
 
     # SHOW IMAGE EXAMPLE
     dataiter = iter(train_loader)
@@ -123,6 +147,8 @@ def run_plant():
     criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     train(net, train_loader, criterion, optimizer)
+    
+    test(net, test_loader, classes)
 
 
 if __name__ == '__main__':
