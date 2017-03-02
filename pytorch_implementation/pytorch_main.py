@@ -49,7 +49,7 @@ class Net(nn.Module):
         return x
 
 
-def train(net, train_loader, criterion, optimizer, cuda=False, epochs=20):
+def train(net, train_loader, criterion, optimizer, cuda=False, epochs=10):
     print('Start Training')
     for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -106,7 +106,24 @@ def test(net, test_loader, classes):
     for i in range(len(classes)):
         print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))
 
-
+def single_prediction(net, test_loader, classes):
+    
+    # determine images
+    dataiter = iter(test_loader)
+    images, labels = next(dataiter)
+    
+    # show true labels
+    print('GroundTruth: ', ' '.join('%5s'%classes[labels[j]] for j in range(4)))
+        
+    # show prediction
+    outputs = net(Variable(images))
+    _, predicted = torch.max(outputs.data, 1)
+    print('Predicted: ', ' '.join('%5s'% classes[predicted[j][0]] for j in range(4)))
+    
+    # show image
+    imshow(torchvision.utils.make_grid(images))
+    
+    
 def run_cifar():
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
@@ -151,6 +168,9 @@ def run_plant():
     train(net, train_loader, criterion, optimizer)
 
     test(net, test_loader, classes)
+    
+    single_prediction(net, test_loader, classes)
+    
 
 
 if __name__ == '__main__':
