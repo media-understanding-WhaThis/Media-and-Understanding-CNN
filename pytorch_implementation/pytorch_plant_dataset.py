@@ -18,19 +18,17 @@ class PlantDataset(dataset.Dataset):
     We extend the PyTorch dataset class, zie: http://pytorch.org/docs/data.html
     """
 
-    def __init__(self, root, data_size, transform=None, target_transform=None, image_size=32, train=True):
+    def __init__(self, root, transform=None, target_transform=None, image_size=32, train=True):
         """
         :param root: Path to datasets, train datasets are prefixed with 'train_' and test datasets are prefixed with
         'test_'. There will be search recursively so just put these files somewhere in the root directory and they
         will be found.
-        :param data_size: data size per file/class
         :param transform: transform object
         """
         super().__init__()
 
         self.transform = transform
         self.target_transform = target_transform
-        self.data_size = data_size
 
         self.total_data_size = 0
 
@@ -49,12 +47,7 @@ class PlantDataset(dataset.Dataset):
                 data = pickle.load(fo)
                 self.train_labels.extend(data['labels'])
                 self.train_data.append(data['data'])
-            self.total_data_size += data_size
-
-        print("self.train_data:")
-        print(self.train_data)
-        print("shape: ")
-        print(len(self.train_data))
+            self.total_data_size += len(data['labels'])
         
         self.train_data = np.concatenate(self.train_data)
         self.train_data = self.train_data.reshape((data_size, 3, image_size, image_size))
@@ -73,4 +66,4 @@ class PlantDataset(dataset.Dataset):
         return img, target
 
     def __len__(self):
-        return self.data_size
+        return self.total_data_size
