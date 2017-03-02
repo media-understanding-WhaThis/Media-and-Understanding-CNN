@@ -126,7 +126,6 @@ def run_cifar():
 def run_plant():
     transform = transforms.Compose([transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),])
-        
 
     # TODO adjust TRAIN data_size
     train_set = PlantDataset(root='data/plantset', data_size=3072, transform=transform)
