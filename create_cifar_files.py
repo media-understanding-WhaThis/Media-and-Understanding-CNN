@@ -5,6 +5,7 @@ Script to create CIFAR like data files
 """
 
 import glob
+import logging
 import pickle
 from itertools import product
 from pathlib import Path
@@ -12,6 +13,8 @@ from pathlib import Path
 import numpy as np
 import progressbar
 from PIL import Image
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 class ImageProcessor:
@@ -89,7 +92,7 @@ class ImageProcessor:
             yield self.im.getpixel((x, y))
 
 
-def write_data_to_dict(out_file_name, images_file_paths, labels, batch_label):
+def write_data_to_dict(out_file_name, images_file_paths, labels, batch_label, max_images):
     """
     Creates a dict with the following keys ['filenames', 'labels', 'data', 'batch_label']
 
@@ -109,10 +112,19 @@ def write_data_to_dict(out_file_name, images_file_paths, labels, batch_label):
     data['labels'] = []
     data['data'] = []
 
+    if len(images_file_paths) < max_images:
+        logging.error('Not enough images provided, provided {0} but max is set to {1}'.format(
+            len(images_file_paths),
+            max_images)
+        )
+
     bar = progressbar.ProgressBar(max_value=len(images_file_paths))
     for idx, image_file_path in enumerate(images_file_paths):
         path = Path(image_file_path)
         if path.exists():
+            if max_images:
+                break
+
             data['filenames'] = path.name
             data['labels'].append(labels[idx])
             data['batch_label'] = batch_label
@@ -179,11 +191,11 @@ if __name__ == '__main__':
     rose_test_files = rose_all_filenames[-20:]  # TODO FIX set real data size
     print('Roses train file...')
     write_data_to_dict('data/plantset/train_rose.p', rose_train_files, [labels['rose']] * len(rose_train_files),
-                       'rose_train')
+                       'rose_train', max_images=1024)
     print('Roses test file...')
     write_data_to_dict('data/plantset/test_rose.p', rose_test_files, [labels['rose']] * len(rose_test_files),
-                       'rose_test')
-                       
+                       'rose_test', max_images=20)
+
     # SUNFLOWERS
     sunflower_all_filenames = glob.glob('data/plantset/sunflower/*')
     print('There are {} sunflower files.'.format(len(sunflower_all_filenames)))
@@ -192,12 +204,14 @@ if __name__ == '__main__':
     sunflower_train_files = sunflower_all_filenames[:1024]  # TODO FIX set real data size
     sunflower_test_files = sunflower_all_filenames[-20:]  # TODO FIX set real data size
     print('Sunflowers train file...')
-    write_data_to_dict('data/plantset/train_sunflower.p', sunflower_train_files, [labels['sunflower']] * len(sunflower_train_files),
-                       'sunflower_train')
+    write_data_to_dict('data/plantset/train_sunflower.p', sunflower_train_files,
+                       [labels['sunflower']] * len(sunflower_train_files),
+                       'sunflower_train', max_images=1024)
     print('Sunflowers test file...')
-    write_data_to_dict('data/plantset/test_sunflower.p', sunflower_test_files, [labels['sunflower']] * len(sunflower_test_files),
-                       'sunflower_test')
-                       
+    write_data_to_dict('data/plantset/test_sunflower.p', sunflower_test_files,
+                       [labels['sunflower']] * len(sunflower_test_files),
+                       'sunflower_test', 20)
+
     # COMMON DAISIES
     daisy_all_filenames = glob.glob('data/plantset/daisy/*')
     print('There are {} daisy files.'.format(len(daisy_all_filenames)))
@@ -207,7 +221,7 @@ if __name__ == '__main__':
     daisy_test_files = daisy_all_filenames[-20:]  # TODO FIX set real data size
     print('Daisy train file...')
     write_data_to_dict('data/plantset/train_daisy.p', daisy_train_files, [labels['daisy']] * len(daisy_train_files),
-                       'daisy_train')
+                       'daisy_train', max_images=1024)
     print('Daisy test file...')
     write_data_to_dict('data/plantset/test_daisy.p', daisy_test_files, [labels['daisy']] * len(daisy_test_files),
-                       'daisy_test')
+                       'daisy_test', max_images=20)
