@@ -113,10 +113,12 @@ def write_data_to_dict(out_file_name, images_file_paths, labels, batch_label, ma
     data['data'] = []
 
     if len(images_file_paths) < max_images:
-        logging.error('Not enough images provided, provided {0} but max is set to {1}'.format(
+        logging.error('Not enough images provided for {0}, provided {1} but max is set to {2}'.format(
+            batch_label,
             len(images_file_paths),
             max_images)
         )
+        return
 
     bar = progressbar.ProgressBar(max_value=len(images_file_paths))
     for idx, image_file_path in enumerate(images_file_paths):
