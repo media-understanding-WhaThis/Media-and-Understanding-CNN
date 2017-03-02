@@ -124,7 +124,7 @@ def write_data_to_dict(out_file_name, images_file_paths, labels, batch_label, ma
     for idx, image_file_path in enumerate(images_file_paths):
         path = Path(image_file_path)
         if path.exists():
-            if max_images:
+            if idx is max_images:
                 break
 
             data['filenames'] = path.name
