@@ -184,8 +184,8 @@ if __name__ == '__main__':
         'daisy': 2
     }
     
-    train_size = 512
-    test_size = 20 
+    train_size = 600
+    test_size = 100
     
     # ROSES
     rose_all_filenames = glob.glob('data/plantset/rose/*')
