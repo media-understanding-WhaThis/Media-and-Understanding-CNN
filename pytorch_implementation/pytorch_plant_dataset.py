@@ -18,7 +18,7 @@ class PlantDataset(dataset.Dataset):
     We extend the PyTorch dataset class, zie: http://pytorch.org/docs/data.html
     """
 
-    def __init__(self, root, data_size, transform=None, target_transform=None, image_size=32):
+    def __init__(self, root, data_size, transform=None, target_transform=None, image_size=32, train=True):
         """
         :param root: Path to datasets, train datasets are prefixed with 'train_' and test datasets are prefixed with
         'test_'. There will be search recursively so just put these files somewhere in the root directory and they
@@ -34,12 +34,16 @@ class PlantDataset(dataset.Dataset):
 
         self.total_data_size = 0
 
-        train_files = glob.glob(root + '/**/train_*', recursive=True)
-        logging.info('Found the following training files: {}'.format(train_files))
+        if train:
+            files = glob.glob(root + '/**/train_*', recursive=True)
+        else:
+            files = glob.glob(root + '/**/test_*', recursive=True)
+
+        logging.info('Found the following training files: {}'.format(files))
 
         self.train_data = []
         self.train_labels = []
-        for file in train_files:
+        for file in files:
             logging.info('Opening pickled train data {}'.format(file))
             with open(file, 'rb') as fo:
                 data = pickle.load(fo)

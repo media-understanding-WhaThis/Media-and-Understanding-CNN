@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.DEBUG)
 def imshow(img):
     img = img / 2 + 0.5  # unnormalize
     npimg = img.numpy()
-    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.imshow(np.transpose(npimg, (2, 1, 0)))
     plt.show()
 
 
@@ -49,10 +49,9 @@ class Net(nn.Module):
         return x
 
 
-def train(net, train_loader, criterion, optimizer, cuda=False):
+def train(net, train_loader, criterion, optimizer, cuda=False, epochs=20):
     print('Start Training')
-    for epoch in range(2):  # loop over the dataset multiple times
-
+    for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
         for i, data in enumerate(train_loader, 0):
             # get the inputs
@@ -75,7 +74,7 @@ def train(net, train_loader, criterion, optimizer, cuda=False):
 
             # print statistics
             running_loss += loss.data[0]
-            if i % 2000 == 1999:  # print every 2000 mini-batches
+            if i % 100 == 99:  # print every 2000 mini-batches
                 print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
                 running_loss = 0.0
     print('Finished Training')
@@ -105,11 +104,11 @@ def run_plant():
                                     ])
 
     # TODO FIX the data sizes for the real size we are going to use
-    train_set = PlantDataset(root='data/plantset', data_size=1024, transform=transform)
+    train_set = PlantDataset(root='data/plantset', data_size=1024, transform=transform, train=True)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
 
-    # test_set = PlantDataset(root='data/plantset', data_size=20, transform=transform)
-    # test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
+    test_set = PlantDataset(root='data/plantset', data_size=20, transform=transform, train=False)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
 
     classes = ['rose']
 
