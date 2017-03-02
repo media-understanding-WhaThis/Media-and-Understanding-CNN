@@ -127,6 +127,7 @@ def run_plant():
     transform = transforms.Compose([transforms.ToTensor(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),])
         
+<<<<<<< Updated upstream
     # TODO FIX the data sizes for the real size we are going to use
     train_set = PlantDataset(root='data/plantset', data_size=1024, transform=transform, train=True)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
@@ -135,6 +136,17 @@ def run_plant():
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
 
     classes = ['rose']
+=======
+    # TODO adjust TRAIN data_size
+    train_set = PlantDataset(root='data/plantset', data_size=3072, transform=transform)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
+     
+    # TODO adjust TEST data_size
+    test_set = PlantDataset(root='data/plantset', data_size=60, transform=transform)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
+
+    classes = ['rose', 'sunflower', 'daisy'] # TODO check whether this works
+>>>>>>> Stashed changes
 
     # SHOW IMAGE EXAMPLE
     dataiter = iter(train_loader)

@@ -51,6 +51,11 @@ class PlantDataset(dataset.Dataset):
                 self.train_data.append(data['data'])
             self.total_data_size += data_size
 
+        print("self.train_data:")
+        print(self.train_data)
+        print("shape: ")
+        print(len(self.train_data))
+        
         self.train_data = np.concatenate(self.train_data)
         self.train_data = self.train_data.reshape((data_size, 3, image_size, image_size))
 
