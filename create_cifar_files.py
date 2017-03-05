@@ -184,7 +184,7 @@ if __name__ == '__main__':
         'sunflower': 1,
         'daisy': 2,
         'hyacinth': 3,
-        'chloropythum_comosom': 4,
+        'chlorophytum_comosum': 4,
         'tradescantia_zebrina': 5,
         'philodendron_scandens': 6
     }

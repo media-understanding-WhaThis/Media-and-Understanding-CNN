@@ -49,7 +49,7 @@ class Net(nn.Module):
         return x
 
 
-def train(net, train_loader, criterion, optimizer, cuda=False, epochs=30):
+def train(net, train_loader, criterion, optimizer, cuda=False, epochs=5):
     print('Start Training')
     for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -75,9 +75,9 @@ def train(net, train_loader, criterion, optimizer, cuda=False, epochs=30):
             # update loss
             running_loss += loss.data[0]
 
-            if i % 100 == 0:  # print every 100 mini-batches
-                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
-                running_loss = 0.0
+        # show status
+        print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss))
+        running_loss = 0.0
     print('Finished Training')
 
 
@@ -103,11 +103,15 @@ def test(net, test_loader, classes):
             class_total[label] += 1
             
     # total accuracy
-    print('Accuracy of the network on test images: %d %%' % (100 * correct / total))
+    accuracy = round(100 * correct / float(total), 1)
+    print('Accuracy of the network on test images: ', str(accuracy), '%')
+    #print('Accuracy of the network on test images: %d %%' % round(100 * correct / float(total), 1))
 
     # accuracy per class
     for i in range(len(classes)):
-        print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))
+        accuracy = round(100 * class_correct[i] / float(class_total[i]), 1)
+        print('Accuracy of ', classes[i], ': ', str(accuracy), '%')
+        #print('Accuracy of %5s : %2d %%' % (classes[i], (float(100 * class_correct[i]) / class_total[i])))
 
 def single_prediction(net, test_loader, classes, batch_size):
     
@@ -146,7 +150,7 @@ def run_cifar():
 
 
 def run_plant():
-    batchSize = 4
+    batchSize = 1
     
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
@@ -158,7 +162,7 @@ def run_plant():
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batchSize, shuffle=True, num_workers=2)
 
     classes = ['rose', 'sunflower', 'daisy', 'hyacinth', 
-        'chloropythum_comosom', 'tradescantia_zebrina', 'philodendron_scandens']
+        'chlorophytum_comosum', 'tradescantia_zebrina', 'philodendron_scandens']
 
     # training
     net = Net()
@@ -170,7 +174,7 @@ def run_plant():
     test(net, test_loader, classes)
     
     # prediction example
-    single_prediction(net, test_loader, classes, batchSize)
+    #single_prediction(net, test_loader, classes, batchSize)
     
 
 
