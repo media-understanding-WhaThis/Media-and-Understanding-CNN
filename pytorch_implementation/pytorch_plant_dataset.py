@@ -50,7 +50,7 @@ class PlantDataset(dataset.Dataset):
             self.total_data_size += len(data['labels'])
         
         self.train_data = np.concatenate(self.train_data)
-        self.train_data = self.train_data.reshape((data_size, 3, image_size, image_size))
+        self.train_data = self.train_data.reshape((self.total_data_size, 3, image_size, image_size))
 
     def __getitem__(self, index):
         img, target = self.train_data[index], self.train_labels[index]

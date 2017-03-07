@@ -3,6 +3,7 @@ Main run file for the the CNN in PyTorch
 """
 
 import logging
+import pickle
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -92,6 +93,7 @@ def test(net, test_loader, classes):
     for data in test_loader:
         images, labels = data
         outputs = net(Variable(images))
+        print(outputs)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum()
@@ -107,37 +109,13 @@ def test(net, test_loader, classes):
         print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))
 
 
-def run_cifar():
-    transform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-                                    ])
-    train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
-
-    dataiter = iter(train_loader)
-    images, labels = next(dataiter)
-    imshow(torchvision.utils.make_grid(images))
-
-    # TRAINING
-    net = Net()
-    criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-    train(net, train_loader, criterion, optimizer)
-
-
-def run_plant():
+def run_train_plant():
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
 
     # TODO adjust TRAIN data_size
     train_set = PlantDataset(root='data/plantset', transform=transform)
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
-     
-    # TODO adjust TEST data_size
-    test_set = PlantDataset(root='data/plantset', transform=transform)
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
-
-    classes = ['rose', 'sunflower', 'daisy']  # TODO check whether this works
 
     # SHOW IMAGE EXAMPLE
     dataiter = iter(train_loader)
@@ -146,13 +124,29 @@ def run_plant():
 
     # TRAINING
     net = Net()
+    saved_net = net.state_dict()
+    pickle.dump(saved_net, 'data/trained_network.p')
+
     criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     train(net, train_loader, criterion, optimizer)
 
-    test(net, test_loader, classes)
+
+def run_test_plant():
+    transform = transforms.Compose([transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
+
+    # TODO adjust TEST data_size
+    test_set = PlantDataset(root='data/plantset', transform=transform)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
+
+    classes = ['rose', 'sunflower', 'daisy']  # TODO check whether this works
+
+    saved_net = pickle.load('data/trained_network.p')
+    test(saved_net, test_loader, classes)
 
 
 if __name__ == '__main__':
     # run_cifar()
-    run_plant()
+    run_train_plant()
+    run_test_plant()
