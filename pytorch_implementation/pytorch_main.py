@@ -3,6 +3,7 @@ Main run file for the the CNN in PyTorch
 """
 
 import logging
+import pickle
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -18,8 +19,6 @@ from pytorch_implementation.pytorch_plant_dataset import PlantDataset
 
 logging.basicConfig(level=logging.DEBUG)
 
-
-# https://github.com/pytorch/tutorials/blob/master/Deep%20Learning%20with%20PyTorch.ipynb
 
 def imshow(img):
     img = img / 2 + 0.5  # unnormalize
@@ -93,14 +92,14 @@ def test(net, test_loader, classes):
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum()
-        
+
         # calculate accuracy per class
         c = (predicted == labels).squeeze()
         for i in range(len(labels)):
             label = labels[i]
             class_correct[label] += c[i]
             class_total[label] += 1
-            
+
     # total accuracy
     accuracy = round(100 * correct / float(total), 1)
     print('Accuracy of the network on test images: ', str(accuracy), '%')
@@ -110,12 +109,33 @@ def test(net, test_loader, classes):
         accuracy = round(100 * class_correct[i] / float(class_total[i]), 1)
         print('Accuracy of ', classes[i], ': ', str(accuracy), '%')
 
+def run_train_plant(train_set, batch_size=4):
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
+
+    net = Net()
+
+    # Save network
+    saved_net = net.state_dict()
+    pickle.dump(saved_net, open('data/trained_network.p', 'wb'))
+
+    criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
+    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+    train(net, train_loader, criterion, optimizer)
+
+
+def run_test_plant(test_set, classes, batch_size=4):
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=2)
+
+    saved_net = pickle.load(open('data/trained_network.p', 'rb'))
+    test(saved_net, test_loader, classes)
+
+
 def single_prediction(net, test_loader, classes):
-    
+
     # determine images
     dataiter = iter(test_loader)
     images, labels = next(dataiter)
-    
+
     # show true labels
     #print('GroundTruth: ', ' '.join('%5s'%classes[labels[j]] for j in range(batch_size)))
     print('GroundTruth: ', classes[labels[0]])
@@ -125,37 +145,22 @@ def single_prediction(net, test_loader, classes):
     _, predicted = torch.max(outputs.data, 1)
     #print('Predicted: ', ' '.join('%5s'% classes[predicted[j][0]] for j in range(batch_size)))
     print('Predicted: ', classes[predicted[0][0]])
-    
+
     # show image
     imshow(torchvision.utils.make_grid(images))
-
-
-def run_plant():      
-    transform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
-
-    train_set = PlantDataset(root='data/plantset', transform=transform, train=True)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
-        
-    test_set = PlantDataset(root='data/plantset', transform=transform, train=False)
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
-
-    classes = ['rose', 'sunflower', 'daisy', 'hyacinth', 'narcissus']
-    #'chlorophytum_comosum', 'tradescantia_zebrina', 'philodendron_scandens'
-
-    # training
-    net = Net()
-    criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-    train(net, train_loader, criterion, optimizer)
-    
-    # testing
-    test(net, test_loader, classes)
-    
-    # prediction example
-    #single_prediction(net, test_loader, classes)
-    
     
 
 if __name__ == '__main__':
-    run_plant()
+    batch_size = 4
+    classes = ['rose', 'sunflower', 'daisy', 'hyacinth', 'narcissus']
+    #'chlorophytum_comosum', 'tradescantia_zebrina', 'philodendron_scandens'
+    
+    transform = transforms.Compose([transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
+
+    train_set = PlantDataset(root='data/plantset', transform=transform)
+    test_set = PlantDataset(root='data/plantset', transform=transform)
+
+    run_train_plant(train_set, batch_size)
+    run_test_plant(test_set, classes, batch_size)
+
