@@ -20,9 +20,6 @@ from pytorch_implementation.pytorch_plant_dataset import PlantDataset
 
 logging.basicConfig(level=logging.DEBUG)
 
-
-# https://github.com/pytorch/tutorials/blob/master/Deep%20Learning%20with%20PyTorch.ipynb
-
 def imshow(img):
     img = img / 2 + 0.5  # unnormalize
     npimg = img.numpy()
@@ -50,7 +47,7 @@ class Net(nn.Module):
         return x
 
 
-def train(net, train_loader, criterion, optimizer, cuda=False, epochs=20):
+def train(net, train_loader, criterion, optimizer, cuda=False, epochs=5):
     print('Start Training')
     for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -73,57 +70,52 @@ def train(net, train_loader, criterion, optimizer, cuda=False, epochs=20):
             loss.backward()
             optimizer.step()
 
-            # print statistics
+            # update loss
             running_loss += loss.data[0]
 
-            # print("i is:"+i)
-            # if i % 2000 == 1999:  # print every 2000 mini-batches
-            if i % 50 == 0:  # print every 2000 mini-batches
-                print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss / 2000))
-                running_loss = 0.0
+        # show status
+        print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss))
+        running_loss = 0.0
     print('Finished Training')
 
 
 def test(net, test_loader, classes):
-    print('Start Testing')
+    # initialize parameters for calculating accuracy
     correct = 0
     total = 0
     class_correct = list(0. for i in range((len(classes))))
     class_total = list(0. for i in range(len(classes)))
+
     for data in test_loader:
         images, labels = data
         outputs = net(Variable(images))
-        print(outputs)
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
         correct += (predicted == labels).sum()
 
+        # calculate accuracy per class
         c = (predicted == labels).squeeze()
-        for i in range(4):
+        for i in range(len(labels)):
             label = labels[i]
             class_correct[label] += c[i]
             class_total[label] += 1
-    print('Accuracy of the network on test images: %d %%' % (100 * correct / total))
 
+    # total accuracy
+    accuracy = round(100 * correct / float(total), 1)
+    print('Accuracy of the network on test images: ', str(accuracy), '%')
+    # print('Accuracy of the network on test images: %d %%' % round(100 * correct / float(total), 1))
+
+    # accuracy per class
     for i in range(len(classes)):
         print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))
 
 
-def run_train_plant():
-    transform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
+def run_train_plant(train_set, batch_size=4):
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
 
-    # TODO adjust TRAIN data_size
-    train_set = PlantDataset(root='data/plantset', transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
-
-    # SHOW IMAGE EXAMPLE
-    dataiter = iter(train_loader)
-    images, labels = next(dataiter)
-    imshow(torchvision.utils.make_grid(images))
-
-    # TRAINING
     net = Net()
+
+    # Save network
     saved_net = net.state_dict()
     pickle.dump(saved_net, 'data/trained_network.p')
 
@@ -132,21 +124,43 @@ def run_train_plant():
     train(net, train_loader, criterion, optimizer)
 
 
-def run_test_plant():
-    transform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
-
-    # TODO adjust TEST data_size
-    test_set = PlantDataset(root='data/plantset', transform=transform)
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
-
-    classes = ['rose', 'sunflower', 'daisy']  # TODO check whether this works
+def run_test_plant(test_set, classes, batch_size=4):
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=2)
 
     saved_net = pickle.load('data/trained_network.p')
     test(saved_net, test_loader, classes)
 
 
+def single_prediction(net, test_loader, classes, batch_size):
+    # determine images
+    dataiter = iter(test_loader)
+    images, labels = next(dataiter)
+
+    # show true labels
+    print('GroundTruth: ', ' '.join('%5s' % classes[labels[j]] for j in range(batch_size)))
+
+    # show prediction
+    outputs = net(Variable(images))
+    _, predicted = torch.max(outputs.data, 1)
+    print('Predicted: ', ' '.join('%5s' % classes[predicted[j][0]] for j in range(batch_size)))
+
+    # show image
+    imshow(torchvision.utils.make_grid(images))
+
+
 if __name__ == '__main__':
-    # run_cifar()
-    run_train_plant()
-    run_test_plant()
+    classes = ['rose', 'sunflower', 'daisy', 'hyacinth',
+               'chlorophytum_comosum', 'tradescantia_zebrina', 'philodendron_scandens']
+
+    batch_size = 1
+
+    transform = transforms.Compose([transforms.ToTensor(),
+                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
+
+    train_set = PlantDataset(root='data/plantset', transform=transform)
+    test_set = PlantDataset(root='data/plantset', transform=transform)
+
+    run_train_plant(train_set, batch_size)
+    run_test_plant(test_set, classes, batch_size)
+
+    # single_prediction(net, test_loader, classes, batchSize)
