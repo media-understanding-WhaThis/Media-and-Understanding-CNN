@@ -177,7 +177,7 @@ def write_data_to_bin(out_file_name, images_file_paths, labels):
 
 
 if __name__ == '__main__':
-    
+
     # Add label to this dictionary
     labels = {
         'rose': 0,
@@ -188,25 +188,24 @@ if __name__ == '__main__':
         'tradescantia_zebrina': 5,
         'philodendron_scandens': 6
     }
-    
-    train_size = 600 # amount of training samples per class
-    test_size = 108 # amount of test samples per class
 
-    print('Train set is '+str(train_size*len(labels))+' images.')
-    print('Test set is '+str(test_size*len(labels))+' images.')
-    print(str(labels)+'different plants are being used for training/testing.')
-    
+    train_size = 600  # amount of training samples per class
+    test_size = 108  # amount of test samples per class
+
+    print('Train set is ' + str(train_size * len(labels)) + ' images.')
+    print('Test set is ' + str(test_size * len(labels)) + ' images.')
+    print(str(labels) + 'different plants are being used for training/testing.')
+
     for plant in labels:
-        all_filenames = glob.glob('data/plantset/'+plant+'/*')
-        print('There are '+str(len(all_filenames))+' '+plant+' files.')
+        all_filenames = glob.glob('data/plantset/' + plant + '/*')
+        print('There are ' + str(len(all_filenames)) + ' ' + plant + ' files.')
         # train_files = all_filenames[:int(len(all_filenames) * .90)]  # Percentage
         # test_files = all_filenames[-int(len(all_filenames) * .10):]
         train_files = all_filenames[:train_size]
         test_files = all_filenames[-test_size:]
-        print(plant+' train file...')
-        write_data_to_dict('data/plantset/train_'+plant+'.p', train_files, [labels[plant]] * len(train_files),
-            plant+'_train', max_images=train_size)
-        print(plant+' test file...')
-        write_data_to_dict('data/plantset/test_'+plant+'.p', test_files, [labels[plant]] * len(test_files),
-            plant+'_test', max_images=test_size)
-    
+        print(plant + ' train file...')
+        write_data_to_dict('data/plantset/train_' + plant + '.p', train_files, [labels[plant]] * len(train_files),
+                           plant + '_train', max_images=train_size)
+        print(plant + ' test file...')
+        write_data_to_dict('data/plantset/test_' + plant + '.p', test_files, [labels[plant]] * len(test_files),
+                           plant + '_test', max_images=test_size)

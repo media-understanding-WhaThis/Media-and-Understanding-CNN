@@ -20,6 +20,7 @@ from pytorch_implementation.pytorch_plant_dataset import PlantDataset
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 def imshow(img):
     img = img / 2 + 0.5  # unnormalize
     npimg = img.numpy()
@@ -117,7 +118,7 @@ def run_train_plant(train_set, batch_size=4):
 
     # Save network
     saved_net = net.state_dict()
-    pickle.dump(saved_net, 'data/trained_network.p')
+    pickle.dump(saved_net, open('data/trained_network.p', 'wb'))
 
     criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
@@ -127,7 +128,7 @@ def run_train_plant(train_set, batch_size=4):
 def run_test_plant(test_set, classes, batch_size=4):
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=2)
 
-    saved_net = pickle.load('data/trained_network.p')
+    saved_net = pickle.load(open('data/trained_network.p', 'wb'))
     test(saved_net, test_loader, classes)
 
 
