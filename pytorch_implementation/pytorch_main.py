@@ -128,7 +128,7 @@ def run_train_plant(train_set, batch_size=4):
 def run_test_plant(test_set, classes, batch_size=4):
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=2)
 
-    saved_net = pickle.load(open('data/trained_network.p', 'wb'))
+    saved_net = pickle.load(open('data/trained_network.p', 'rb'))
     test(saved_net, test_loader, classes)
 
 
