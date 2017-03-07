@@ -3,7 +3,6 @@ Main run file for the the CNN in PyTorch
 """
 
 import logging
-
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -49,7 +48,7 @@ class Net(nn.Module):
         return x
 
 
-def train(net, train_loader, criterion, optimizer, cuda=False, epochs=5):
+def train(net, train_loader, criterion, optimizer, cuda=False, epochs=100):
     print('Start Training')
     for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -105,64 +104,44 @@ def test(net, test_loader, classes):
     # total accuracy
     accuracy = round(100 * correct / float(total), 1)
     print('Accuracy of the network on test images: ', str(accuracy), '%')
-    #print('Accuracy of the network on test images: %d %%' % round(100 * correct / float(total), 1))
 
     # accuracy per class
     for i in range(len(classes)):
         accuracy = round(100 * class_correct[i] / float(class_total[i]), 1)
         print('Accuracy of ', classes[i], ': ', str(accuracy), '%')
-        #print('Accuracy of %5s : %2d %%' % (classes[i], (float(100 * class_correct[i]) / class_total[i])))
 
-def single_prediction(net, test_loader, classes, batch_size):
+def single_prediction(net, test_loader, classes):
     
     # determine images
     dataiter = iter(test_loader)
     images, labels = next(dataiter)
     
     # show true labels
-    print('GroundTruth: ', ' '.join('%5s'%classes[labels[j]] for j in range(batch_size)))
-        
+    #print('GroundTruth: ', ' '.join('%5s'%classes[labels[j]] for j in range(batch_size)))
+    print('GroundTruth: ', classes[labels[0]])
+            
     # show prediction
     outputs = net(Variable(images))
     _, predicted = torch.max(outputs.data, 1)
-    print('Predicted: ', ' '.join('%5s'% classes[predicted[j][0]] for j in range(batch_size)))
+    #print('Predicted: ', ' '.join('%5s'% classes[predicted[j][0]] for j in range(batch_size)))
+    print('Predicted: ', classes[predicted[0][0]])
     
     # show image
     imshow(torchvision.utils.make_grid(images))
-    
-    
-def run_cifar():
-    transform = transforms.Compose([transforms.ToTensor(),
-                                    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-                                    ])
-    train_set = torchvision.datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
-
-    dataiter = iter(train_loader)
-    images, labels = next(dataiter)
-    imshow(torchvision.utils.make_grid(images))
-
-    # TRAINING
-    net = Net()
-    criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
-    optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-    train(net, train_loader, criterion, optimizer)
 
 
-def run_plant():
-    batchSize = 1
-    
+def run_plant():      
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
 
-    train_set = PlantDataset(root='data/plantset', transform=transform)
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batchSize, shuffle=True, num_workers=2)
-     
-    test_set = PlantDataset(root='data/plantset', transform=transform)
-    test_loader = torch.utils.data.DataLoader(test_set, batch_size=batchSize, shuffle=True, num_workers=2)
+    train_set = PlantDataset(root='data/plantset', transform=transform, train=True)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=4, shuffle=True, num_workers=2)
+        
+    test_set = PlantDataset(root='data/plantset', transform=transform, train=False)
+    test_loader = torch.utils.data.DataLoader(test_set, batch_size=4, shuffle=True, num_workers=2)
 
-    classes = ['rose', 'sunflower', 'daisy', 'hyacinth', 
-        'chlorophytum_comosum', 'tradescantia_zebrina', 'philodendron_scandens']
+    classes = ['rose', 'sunflower', 'daisy', 'hyacinth', 'narcissus']
+    #'chlorophytum_comosum', 'tradescantia_zebrina', 'philodendron_scandens'
 
     # training
     net = Net()
@@ -174,10 +153,9 @@ def run_plant():
     test(net, test_loader, classes)
     
     # prediction example
-    #single_prediction(net, test_loader, classes, batchSize)
+    #single_prediction(net, test_loader, classes)
+    
     
 
-
 if __name__ == '__main__':
-    # run_cifar()
     run_plant()

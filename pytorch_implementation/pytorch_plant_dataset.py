@@ -34,10 +34,10 @@ class PlantDataset(dataset.Dataset):
 
         if train:
             files = glob.glob(root + '/**/train_*', recursive=True)
+            logging.info('Found the following train files: {}'.format(files))
         else:
             files = glob.glob(root + '/**/test_*', recursive=True)
-
-        logging.info('Found the following training files: {}'.format(files))
+            logging.info('Found the following test files: {}'.format(files))
 
         self.train_data = []
         self.train_labels = []
