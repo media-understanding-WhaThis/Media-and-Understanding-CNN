@@ -184,13 +184,15 @@ if __name__ == '__main__':
         'sunflower': 1,
         'daisy': 2,
         'hyacinth': 3,
-        'chlorophytum_comosum': 4,
-        'tradescantia_zebrina': 5,
-        'philodendron_scandens': 6
+        'narcissus': 4
     }
+        #'chlorophytum_comosum': 5,
+        #'tradescantia_zebrina': 6,
+        #'philodendron_scandens': 7,
+        #'narcissus': 8
     
-    train_size = 600 # amount of training samples per class
-    test_size = 108 # amount of test samples per class
+    train_size = 600 # amount of training samples per class (600)
+    test_size = 108 # amount of test samples per class (108)
 
     print('Train set is '+str(train_size*len(labels))+' images.')
     print('Test set is '+str(test_size*len(labels))+' images.')
@@ -203,10 +205,15 @@ if __name__ == '__main__':
         # test_files = all_filenames[-int(len(all_filenames) * .10):]
         train_files = all_filenames[:train_size]
         test_files = all_filenames[-test_size:]
+        
         print(plant+' train file...')
         write_data_to_dict('data/plantset/train_'+plant+'.p', train_files, [labels[plant]] * len(train_files),
             plant+'_train', max_images=train_size)
         print(plant+' test file...')
         write_data_to_dict('data/plantset/test_'+plant+'.p', test_files, [labels[plant]] * len(test_files),
             plant+'_test', max_images=test_size)
+    
+    #test_file = glob.glob('data/plantset/single/*')
+    #write_data_to_dict('data/plantset/single/test_hyacinth.p', test_file, [labels['hyacinth']],
+    #   'hyacinth_test', max_images=1)
     
