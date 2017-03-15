@@ -3,7 +3,6 @@ Main run file for the the CNN in PyTorch
 """
 
 import logging
-
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -33,7 +32,7 @@ class Net(nn.Module):
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
-        #self.pool = nn.MaxPool2d(2, 2)
+        self.pool = nn.MaxPool2d(2, 2)
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
@@ -48,7 +47,7 @@ class Net(nn.Module):
         return x
 
 
-def train(net, train_loader, criterion, optimizer, cuda=False, epochs=70):
+def train(net, train_loader, criterion, optimizer, cuda=False, epochs=3):
     print('Start Training')
     for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -122,14 +121,10 @@ def run_train_plant(train_set, batch_size=4):
         
     # Save network
     saved_net = net.state_dict()
-    #pickle.dump(saved_net, open('data/trained_network.p', 'wb'))
     torch.save(net, 'data/trained_network.p')
-    
-
 
 def run_test_plant(test_set, classes, batch_size=4):
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=2)
-    #saved_net = pickle.load(open('data/trained_network.p', 'rb'))
     saved_net = torch.load('data/trained_network.p')
     test(saved_net, test_loader, classes)
 
@@ -151,9 +146,8 @@ def single_prediction(net, image_path, classes):
     
 
 if __name__ == '__main__':
-    batch_size = 3
-    classes = ['rose', 'sunflower', 'daisy'] #, 'hyacinth', 'narcissus']
-    #'chlorophytum_comosum', 'tradescantia_zebrina', 'philodendron_scandens'
+    batch_size = 4
+    classes = ['rose', 'sunflower', 'daisy', 'forget-me-not']
     
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
