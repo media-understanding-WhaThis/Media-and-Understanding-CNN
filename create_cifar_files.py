@@ -182,25 +182,23 @@ if __name__ == '__main__':
     labels = {
         'rose': 0,          # 1407 files
         'sunflower': 1,     # 1167 files
-        'daisy': 2          #  730 files
-        #'hyacinth': 3,     #  830 files
-        #'narcissus': 4,    # 1354 files
-        #'forget-me-not': 5 # 1242 files
+        'daisy': 2,         #  730 files
+        'forget-me-not': 3  # 1242 files
+        #'hyacinth': 4,      #  830 files
+        #'narcissus': 5,     # 1354 files
     }
 
     train_size = 600  # amount of training samples per class
     test_size = 130  # amount of test samples per class
 
-    #print('Train set is ' + str(train_size * len(labels)) + ' images.')
-    #print('Test set is ' + str(test_size * len(labels)) + ' images.')
+    print('Train set is ' + str(train_size * len(labels)) + ' images.')
+    print('Test set is ' + str(test_size * len(labels)) + ' images.')
     print(str(labels) + 'different plants are being used for training/testing.')
 
     for plant in labels:
             
         all_filenames = glob.glob('data/plantset/' + plant + '/*')
         print('There are ' + str(len(all_filenames)) + ' ' + plant + ' files.')
-        # train_files = all_filenames[:int(len(all_filenames) * .90)]  # Percentage
-        # test_files = all_filenames[-int(len(all_filenames) * .10):]
         train_files = all_filenames[:train_size]
         test_files = all_filenames[-test_size:]
         
