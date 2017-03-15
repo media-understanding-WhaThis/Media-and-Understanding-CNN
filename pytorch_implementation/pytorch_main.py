@@ -47,7 +47,7 @@ class Net(nn.Module):
         return x
 
 
-def train(net, train_loader, criterion, optimizer, cuda=False, epochs=3):
+def train(net, train_loader, criterion, optimizer, test_set, batch_size, cuda=False, epochs=30):
     print('Start Training')
     for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -76,6 +76,11 @@ def train(net, train_loader, criterion, optimizer, cuda=False, epochs=3):
         # show status
         print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss))
         running_loss = 0.0
+        
+        if epoch % 5 == 0:
+            test_loader = torch.utils.data.DataLoader(
+                test_set, batch_size=batch_size, shuffle=True, num_workers=2)
+            test(net, test_loader, classes)
     print('Finished Training')
 
 
@@ -110,14 +115,14 @@ def test(net, test_loader, classes):
         accuracy = round(100 * class_correct[i] / float(class_total[i]), 1)
         print('Accuracy of ', classes[i], ': ', str(accuracy), '%')
 
-def run_train_plant(train_set, batch_size=4):
+def run_train_plant(train_set, test_set, batch_size=4):
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
 
     net = Net()
     
     criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
-    train(net, train_loader, criterion, optimizer)
+    train(net, train_loader, criterion, optimizer, test_set, batch_size)
         
     # Save network
     saved_net = net.state_dict()
@@ -155,8 +160,10 @@ if __name__ == '__main__':
     train_set = PlantDataset(root='data/plantset', transform=transform, train=True)
     test_set = PlantDataset(root='data/plantset', transform=transform, train=False)
 
-    run_train_plant(train_set, batch_size)
+    run_train_plant(train_set, test_set, batch_size)
     run_test_plant(test_set, classes, batch_size)
 
-    saved_net = torch.load('data/trained_network.p')
-    single_prediction(saved_net, 'data/9449489_1c398e29e4.jpg', classes)
+    #saved_net = torch.load('data/trained_network.p')
+    #predicted_num, classes[predicted_num] = single_prediction(
+    #    saved_net, 'data/plantset/sunflower/1001901836_3d592b5f93.jpg', classes)
+    #print(classes[predicted_num])
