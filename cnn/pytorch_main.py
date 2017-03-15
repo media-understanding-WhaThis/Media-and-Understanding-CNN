@@ -11,11 +11,10 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torchvision.transforms as transforms
-from torch.autograd import Variable
-from torch.utils.data import dataset
-
 from cnn.image_processor import ImageProcessor
 from cnn.pytorch_plant_dataset import PlantDataset
+from torch.autograd import Variable
+from torch.utils.data import dataset
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -77,7 +76,7 @@ def train(net, train_loader, criterion, optimizer, test_set, batch_size, cuda=Fa
         # show status
         print('[%d, %5d] loss: %.3f' % (epoch + 1, i + 1, running_loss))
         running_loss = 0.0
-        
+
         if epoch % 5 == 0:
             test_loader = torch.utils.data.DataLoader(
                 test_set, batch_size=batch_size, shuffle=True, num_workers=2)
@@ -91,7 +90,7 @@ def test(net, test_loader, classes):
     total = 0
     class_correct = list(0. for i in range((len(classes))))
     class_total = list(0. for i in range(len(classes)))
-    
+
     for data in test_loader:
         images, labels = data
         # Variable(images) = [torch.FloatTensor of size 4x3x32x32]
@@ -116,18 +115,20 @@ def test(net, test_loader, classes):
         accuracy = round(100 * class_correct[i] / float(class_total[i]), 1)
         print('Accuracy of ', classes[i], ': ', str(accuracy), '%')
 
+
 def run_train_plant(train_set, test_set, batch_size=4):
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
 
     net = Net()
-    
+
     criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     train(net, train_loader, criterion, optimizer, test_set, batch_size)
-        
+
     # Save network
     saved_net = net.state_dict()
     torch.save(net, 'data/trained_network.p')
+
 
 def run_test_plant(test_set, classes, batch_size=4):
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=2)
@@ -149,12 +150,15 @@ def single_prediction(net, image_path, classes):
     predicted_num = predicted[0][0]
 
     return predicted_num, classes[predicted_num]
-    
+
+
+def used_classes():
+    return ['rose', 'sunflower', 'daisy', 'forget-me-not']
+
 
 if __name__ == '__main__':
     batch_size = 4
-    classes = ['rose', 'sunflower', 'daisy', 'forget-me-not']
-    
+
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
 
@@ -162,9 +166,9 @@ if __name__ == '__main__':
     test_set = PlantDataset(root='data/plantset', transform=transform, train=False)
 
     run_train_plant(train_set, test_set, batch_size)
-    run_test_plant(test_set, classes, batch_size)
+    run_test_plant(test_set, used_classes(), batch_size)
 
-    #saved_net = torch.load('data/trained_network.p')
-    #predicted_num, classes[predicted_num] = single_prediction(
+    # saved_net = torch.load('data/trained_network.p')
+    # predicted_num, classes[predicted_num] = single_prediction(
     #    saved_net, 'data/plantset/sunflower/1001901836_3d592b5f93.jpg', classes)
-    #print(classes[predicted_num])
+    # print(classes[predicted_num])
