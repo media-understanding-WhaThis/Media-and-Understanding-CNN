@@ -182,21 +182,29 @@ if __name__ == '__main__':
     labels = {
         'rose': 0,          # 1407 files
         'sunflower': 1,     # 1167 files
-        'daisy': 2,         #  730 files
+        'daisy': 2,         #  1040 files
         'forget-me-not': 3  # 1242 files
         #'hyacinth': 4,      #  830 files
         #'narcissus': 5,     # 1354 files
     }
 
-    train_size = 600  # amount of training samples per class
-    test_size = 130  # amount of test samples per class
+    train_size = 800  # amount of training samples per class
+    test_size = 240  # amount of test samples per class
 
     print('Train set is ' + str(train_size * len(labels)) + ' images.')
     print('Test set is ' + str(test_size * len(labels)) + ' images.')
     print(str(labels) + 'different plants are being used for training/testing.')
 
     for plant in labels:
-            
+        if plant == "rose":
+            train_size, test_size = 1126, 281
+        elif plant == "sunflower":
+            train_size, test_size = 934, 233
+        elif plant == "daisy":
+            train_size, test_size = 832, 208
+        elif plant == "forget-me-not":
+            train_size, test_size = 994, 248
+        
         all_filenames = glob.glob('data/plantset/' + plant + '/*')
         print('There are ' + str(len(all_filenames)) + ' ' + plant + ' files.')
         train_files = all_filenames[:train_size]
