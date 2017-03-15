@@ -3,18 +3,18 @@ Main run file for the the CNN in PyTorch
 """
 
 import logging
-import pickle
+
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import torchvision
 import torchvision.transforms as transforms
 from torch.autograd import Variable
 from torch.utils.data import dataset
 
+from pytorch_implementation.image_processor import ImageProcessor
 from pytorch_implementation.pytorch_plant_dataset import PlantDataset
 
 logging.basicConfig(level=logging.DEBUG)
@@ -134,24 +134,20 @@ def run_test_plant(test_set, classes, batch_size=4):
     test(saved_net, test_loader, classes)
 
 
-def single_prediction(net, test_loader, classes):
+def single_prediction(net, image_path, classes):
+    processor = ImageProcessor(image_path)
+    processor.center_crop()
+    processor.resize_image()
+    processed_image = np.asarray(processor.im, dtype=np.float32)
 
-    # determine images
-    dataiter = iter(test_loader)
-    images, labels = next(dataiter)
+    processed_tensor = torch.from_numpy(np.transpose(processed_image))
+    squeezed = processed_tensor.unsqueeze(0)
 
-    # show true labels
-    #print('GroundTruth: ', ' '.join('%5s'%classes[labels[j]] for j in range(batch_size)))
-    print('GroundTruth: ', classes[labels[0]])
-            
-    # show prediction
-    outputs = net(Variable(images))
+    outputs = net(Variable(squeezed))
     _, predicted = torch.max(outputs.data, 1)
-    #print('Predicted: ', ' '.join('%5s'% classes[predicted[j][0]] for j in range(batch_size)))
-    print('Predicted: ', classes[predicted[0][0]])
+    predicted_num = predicted[0][0]
 
-    # show image
-    imshow(torchvision.utils.make_grid(images))
+    return predicted_num, classes[predicted_num]
     
 
 if __name__ == '__main__':
@@ -167,5 +163,6 @@ if __name__ == '__main__':
 
     run_train_plant(train_set, batch_size)
     run_test_plant(test_set, classes, batch_size)
-    #run_test_plant(test_set, classes, batch_size)
 
+    saved_net = torch.load('data/trained_network.p')
+    single_prediction(saved_net, 'data/9449489_1c398e29e4.jpg', classes)
