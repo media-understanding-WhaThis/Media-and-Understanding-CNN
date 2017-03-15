@@ -3,6 +3,7 @@ Main run file for the the CNN in PyTorch
 """
 
 import logging
+
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -13,8 +14,8 @@ import torchvision.transforms as transforms
 from torch.autograd import Variable
 from torch.utils.data import dataset
 
-from pytorch_implementation.image_processor import ImageProcessor
-from pytorch_implementation.pytorch_plant_dataset import PlantDataset
+from cnn.image_processor import ImageProcessor
+from cnn.pytorch_plant_dataset import PlantDataset
 
 logging.basicConfig(level=logging.DEBUG)
 

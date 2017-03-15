@@ -1,2 +1,3 @@
 data/*
-pytorch_implementation/__pycache__
+cnn/__pycache__
+*.egg-info
