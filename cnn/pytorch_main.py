@@ -136,7 +136,9 @@ def run_test_plant(test_set, classes, batch_size=4):
     test(saved_net, test_loader, classes)
 
 
-def single_prediction(net, image_path, classes):
+def single_prediction(image_path, classes):
+    saved_net = torch.load('data/trained_network.p')
+
     processor = ImageProcessor(image_path)
     processor.center_crop()
     processor.resize_image()
@@ -145,7 +147,7 @@ def single_prediction(net, image_path, classes):
     processed_tensor = torch.from_numpy(np.transpose(processed_image))
     squeezed = processed_tensor.unsqueeze(0)
 
-    outputs = net(Variable(squeezed))
+    outputs = saved_net(Variable(squeezed))
     _, predicted = torch.max(outputs.data, 1)
     predicted_num = predicted[0][0]
 
