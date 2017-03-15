@@ -180,25 +180,23 @@ if __name__ == '__main__':
 
     # Add label to this dictionary
     labels = {
-        'rose': 0,
-        'sunflower': 1,
-        'daisy': 2,
-        'hyacinth': 3,
-        'narcissus': 4
+        'rose': 0,          # 1407 files
+        'sunflower': 1,     # 1167 files
+        'daisy': 2          #  730 files
+        #'hyacinth': 3,     #  830 files
+        #'narcissus': 4,    # 1354 files
+        #'forget-me-not': 5 # 1242 files
     }
-        #'chlorophytum_comosum': 5,
-        #'tradescantia_zebrina': 6,
-        #'philodendron_scandens': 7,
-        #'narcissus': 8
 
     train_size = 600  # amount of training samples per class
-    test_size = 108  # amount of test samples per class
+    test_size = 130  # amount of test samples per class
 
-    print('Train set is ' + str(train_size * len(labels)) + ' images.')
-    print('Test set is ' + str(test_size * len(labels)) + ' images.')
+    #print('Train set is ' + str(train_size * len(labels)) + ' images.')
+    #print('Test set is ' + str(test_size * len(labels)) + ' images.')
     print(str(labels) + 'different plants are being used for training/testing.')
 
     for plant in labels:
+            
         all_filenames = glob.glob('data/plantset/' + plant + '/*')
         print('There are ' + str(len(all_filenames)) + ' ' + plant + ' files.')
         # train_files = all_filenames[:int(len(all_filenames) * .90)]  # Percentage
@@ -212,9 +210,5 @@ if __name__ == '__main__':
         print(plant+' test file...')
         write_data_to_dict('data/plantset/test_'+plant+'.p', test_files, [labels[plant]] * len(test_files),
             plant+'_test', max_images=test_size)
-    
-    #test_file = glob.glob('data/plantset/single/*')
-    #write_data_to_dict('data/plantset/single/test_hyacinth.p', test_file, [labels['hyacinth']],
-    #   'hyacinth_test', max_images=1)
 
 

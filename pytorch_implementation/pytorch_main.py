@@ -33,6 +33,7 @@ class Net(nn.Module):
         self.conv1 = nn.Conv2d(3, 6, 5)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(6, 16, 5)
+        #self.pool = nn.MaxPool2d(2, 2)
         self.fc1 = nn.Linear(16 * 5 * 5, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
@@ -47,7 +48,7 @@ class Net(nn.Module):
         return x
 
 
-def train(net, train_loader, criterion, optimizer, cuda=False, epochs=100):
+def train(net, train_loader, criterion, optimizer, cuda=False, epochs=70):
     print('Start Training')
     for epoch in range(epochs):  # loop over the dataset multiple times
         running_loss = 0.0
@@ -85,9 +86,10 @@ def test(net, test_loader, classes):
     total = 0
     class_correct = list(0. for i in range((len(classes))))
     class_total = list(0. for i in range(len(classes)))
-
+    
     for data in test_loader:
         images, labels = data
+        # Variable(images) = [torch.FloatTensor of size 4x3x32x32]
         outputs = net(Variable(images))
         _, predicted = torch.max(outputs.data, 1)
         total += labels.size(0)
@@ -113,20 +115,22 @@ def run_train_plant(train_set, batch_size=4):
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
 
     net = Net()
-
-    # Save network
-    saved_net = net.state_dict()
-    pickle.dump(saved_net, open('data/trained_network.p', 'wb'))
-
+    
     criterion = nn.CrossEntropyLoss()  # use a Classification Cross-Entropy loss
     optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
     train(net, train_loader, criterion, optimizer)
+        
+    # Save network
+    saved_net = net.state_dict()
+    #pickle.dump(saved_net, open('data/trained_network.p', 'wb'))
+    torch.save(net, 'data/trained_network.p')
+    
 
 
 def run_test_plant(test_set, classes, batch_size=4):
     test_loader = torch.utils.data.DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=2)
-
-    saved_net = pickle.load(open('data/trained_network.p', 'rb'))
+    #saved_net = pickle.load(open('data/trained_network.p', 'rb'))
+    saved_net = torch.load('data/trained_network.p')
     test(saved_net, test_loader, classes)
 
 
@@ -151,16 +155,17 @@ def single_prediction(net, test_loader, classes):
     
 
 if __name__ == '__main__':
-    batch_size = 4
-    classes = ['rose', 'sunflower', 'daisy', 'hyacinth', 'narcissus']
+    batch_size = 3
+    classes = ['rose', 'sunflower', 'daisy'] #, 'hyacinth', 'narcissus']
     #'chlorophytum_comosum', 'tradescantia_zebrina', 'philodendron_scandens'
     
     transform = transforms.Compose([transforms.ToTensor(),
                                     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)), ])
 
-    train_set = PlantDataset(root='data/plantset', transform=transform)
-    test_set = PlantDataset(root='data/plantset', transform=transform)
+    train_set = PlantDataset(root='data/plantset', transform=transform, train=True)
+    test_set = PlantDataset(root='data/plantset', transform=transform, train=False)
 
     run_train_plant(train_set, batch_size)
     run_test_plant(test_set, classes, batch_size)
+    #run_test_plant(test_set, classes, batch_size)
 

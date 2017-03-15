@@ -42,7 +42,11 @@ class PlantDataset(dataset.Dataset):
         self.train_data = []
         self.train_labels = []
         for file in files:
-            logging.info('Opening pickled train data {}'.format(file))
+            if train:
+                logging.info('Opening pickled train data {}'.format(file))
+            else:
+                logging.info('Opening pickled test data {}'.format(file))
+                
             with open(file, 'rb') as fo:
                 data = pickle.load(fo)
                 self.train_labels.extend(data['labels'])
